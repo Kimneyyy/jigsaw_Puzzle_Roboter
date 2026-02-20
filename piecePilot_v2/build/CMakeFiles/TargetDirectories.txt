@@ -1,0 +1,5 @@
+/home/kimi-sickinger/Programmieren/qt/piecePilot_v2/build/CMakeFiles/kantenAnzeigen.dir
+/home/kimi-sickinger/Programmieren/qt/piecePilot_v2/build/CMakeFiles/edit_cache.dir
+/home/kimi-sickinger/Programmieren/qt/piecePilot_v2/build/CMakeFiles/rebuild_cache.dir
+/home/kimi-sickinger/Programmieren/qt/piecePilot_v2/build/CMakeFiles/kantenAnzeigen_autogen_timestamp_deps.dir
+/home/kimi-sickinger/Programmieren/qt/piecePilot_v2/build/CMakeFiles/kantenAnzeigen_autogen.dir
