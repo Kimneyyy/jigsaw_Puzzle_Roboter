@@ -7,6 +7,8 @@ class PieceScan;
 class PieceInfo;
 class PieceEdgeProfile;
 class Board;
+struct BestNextPlace;
+
 
 class AppController : public QObject
 {
@@ -40,4 +42,6 @@ private:
     Board* board = nullptr;
     //void generateDummyPieces();
     QString basePath;
+
+    BestNextPlace* searchBestNextPlaceInBestPlaces(std::vector<BestNextPlace*> bestPlaces);
 };

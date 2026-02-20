@@ -99,7 +99,7 @@ void SortGridPage::rebuildGrid()
         QRectF pr(margin + gx * cell + 8, margin + gy * cell + 8, cell - 16, cell - 16);
         auto *p = m_scene->addRect(pr);
         p->setOpacity(0.8);
-        p->setToolTip(piece->name + QString(" (ID: %1)").arg(piece->id) + QString(", x: %1, y: %2, rotation: %3°").arg(placement->x).arg(placement->y).arg(placement->rotation));
+        p->setToolTip(piece->name + QString(" (ID: %1)").arg(piece->id) + QString(", x: %1, y: %2, rotation: %3°, array_position: %4, matchScore: %5").arg(placement->x).arg(placement->y).arg(placement->rotation).arg(i).arg(placement->matchScore));
         p->setFlag(QGraphicsItem::ItemIsMovable, true);
         p->setFlag(QGraphicsItem::ItemIsSelectable, true);
         // Bild von piece->imagePath als Hintergrund des Rechteckes einfügen

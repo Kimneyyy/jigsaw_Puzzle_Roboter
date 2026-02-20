@@ -207,6 +207,8 @@ void AppController::sortPieceToBoard()
         int bestPieceID = -1;
         int bestEdgeID = -1;
 
+        std::vector<BestNextPlace*> bestNextPlaces; // alle besten nächsten Plätze sammeln, um später den mit der besten Bewertung auszuwählen
+
         for(int i = 0; i < pieceInfo.size(); i++){
             PieceInfo* piece = pieceInfo[i];
 
@@ -215,21 +217,33 @@ void AppController::sortPieceToBoard()
             }
 
             for(int e=0; e < 4; e++){
-                bestNextPlace* bnp = board->getBestNextPlace(piece->id, e, pieceInfo);
+                BestNextPlace* bnp = board->getBestNextPlace(piece->id, e, pieceInfo);
                 if(!bnp) continue; // kein Platz gefunden, überspringen
 
-                if(bnp->matchScore < bestScore){
+                bnp->pieceID = piece->id;
+                bnp->edgeID = e;
+                bestNextPlaces.push_back(bnp);
+                /* if(bnp->matchScore < bestScore){
                     bestScore = bnp->matchScore;
                     bestPieceID = piece->id;
                     bestX = bnp->x;
                     bestY = bnp->y;
                     bestPositionRelativeToNeighbor = bnp->positionRelativeToNeighbor;
                     bestEdgeID = e;
-                }
+                } */
             }
 
             //board->addPiece(piece->id, x, y, rotation);
         }
+
+        BestNextPlace* bestPlace = searchBestNextPlaceInBestPlaces(bestNextPlaces);
+        bestEdgeID = bestPlace->edgeID;
+        bestPieceID = bestPlace->pieceID;
+        bestX = bestPlace->x;
+        bestY = bestPlace->y;
+        bestPositionRelativeToNeighbor = bestPlace->positionRelativeToNeighbor;
+        bestScore = bestPlace->matchScore;
+
 
         // Hier jetzt berechnung, welche Rotation das neue Teil haben muss, damit die Kante an die Nachbarkante passt
         int bestRotation = 0;
@@ -248,7 +262,50 @@ void AppController::sortPieceToBoard()
             bestRotation = Helpers::wrapIndex(bestEdgeID - 1, 4) * 90;  // -3
         }
 
-        board->addPiece(bestPieceID, bestX, bestY, bestRotation);
+        board->addPiece(bestPieceID, bestX, bestY, bestRotation, bestScore);
 
     }
+}
+
+
+BestNextPlace* AppController::searchBestNextPlaceInBestPlaces(std::vector<BestNextPlace*> bestPlaces)
+{
+    BestNextPlace* bestPlace = nullptr;
+    std::vector<BestNextPlace*> groupedBestPlaces; // beste Plätze gruppieren, die an derselben Nachbarposition liegen (z.B. alle Plätze, die oben an einem Nachbarn liegen)
+
+    for(int i=0; i < bestPlaces.size(); i++){
+        bool foundGroup = false;
+        for(int j=0; j < groupedBestPlaces.size(); j++){
+            if((bestPlaces[i]->x == groupedBestPlaces[j]->x && bestPlaces[i]->y == groupedBestPlaces[j]->y) && (bestPlaces[i]->pieceID == groupedBestPlaces[j]->pieceID  && bestPlaces[i]->positionRelativeToNeighbor != groupedBestPlaces[j]->positionRelativeToNeighbor)){ // wenn schon ein Platz mit derselben Position und demselben Nachbarn existiert, dann zur Gruppe hinzufügen
+                foundGroup = true;
+                // Hier score verrechnen auf Grund der Duplikate
+                groupedBestPlaces[j]->matchScore += bestPlaces[i]->matchScore; // einfache Addition
+                groupedBestPlaces[j]->neighborPieceID ++;
+            }
+        }
+
+        if(!foundGroup){
+            groupedBestPlaces.push_back(bestPlaces[i]);
+        }
+    }
+
+    double nachbarGewichtung = 2;
+    // Nachbar gewichtung einrechnen, damit Plätze bevorzugt werden, die an mehr Nachbarn liegen
+    for(int i=0; i < groupedBestPlaces.size(); i++){
+        if(groupedBestPlaces[i]->neighborPieceID > 0){
+            groupedBestPlaces[i]->matchScore = groupedBestPlaces[i]->matchScore / ((groupedBestPlaces[i]->neighborPieceID + 1) * nachbarGewichtung); // je mehr Nachbarn, desto besser
+        }
+    }
+
+
+    // Besten Platz auswählen
+    double bestScore = std::numeric_limits<double>::infinity();
+    for(int i=0; i < groupedBestPlaces.size(); i++){
+        if(groupedBestPlaces[i]->matchScore < bestScore){
+            bestScore = groupedBestPlaces[i]->matchScore;
+            bestPlace = groupedBestPlaces[i];
+        }
+    }
+
+    return bestPlace;
 }

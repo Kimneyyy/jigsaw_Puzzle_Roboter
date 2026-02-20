@@ -16,13 +16,14 @@ Board::~Board()
 }
 
 
-void Board::addPiece(int pieceID, int x, int y, int rotation)
+void Board::addPiece(int pieceID, int x, int y, int rotation, double matchScore)
 {
     Placement* p = new Placement();
     p->pieceID = pieceID;
     p->x = x;
     p->y = y;
     p->rotation = rotation;
+    p->matchScore = matchScore;
     placements.push_back(p);
 }
 
@@ -37,7 +38,7 @@ Placement* Board::getPlacement(int x, int y)
 }
 
 
-bestNextPlace* Board::getBestNextPlace(int pieceID, int edgeID, std::vector<PieceInfo*> pieces)
+BestNextPlace* Board::getBestNextPlace(int pieceID, int edgeID, std::vector<PieceInfo*> pieces)
 {
     double bestScore = -1;
     int bestPieceID = -1;
@@ -80,7 +81,7 @@ bestNextPlace* Board::getBestNextPlace(int pieceID, int edgeID, std::vector<Piec
 
     if(bestScore < 0) return nullptr; // kein Platz gefunden
 
-    bestNextPlace* bnp = new bestNextPlace();
+    BestNextPlace* bnp = new BestNextPlace();
     bnp->pieceID = bestPieceID;
     bnp->edgeID = bestEdgeID;
     bnp->matchScore = bestScore;
