@@ -9,6 +9,7 @@
 #include "Board.h"
 #include "Placement.h"
 #include "Helpers.h"
+#include <QStringLiteral>
 
 AppController::AppController()
     : QObject(nullptr)
@@ -16,14 +17,17 @@ AppController::AppController()
     this->pieceScanner = new PieceScan();
     this->board = new Board(this);
 
-    QString basePath = "/home/kimi-sickinger/Programmieren/qt/piecePilot_v2/src/img/";
+    //QString basePath = "/home/kimi-sickinger/Programmieren/qt/piecePilot_v2/src/img/";
+    basePath = QString(BASE_DIR) + "/src";
+    QString imgPath = basePath + "/img/";
+    std::cout << "Scanning pieces in directory: " << imgPath.toStdString() << std::endl;
     // get all png files in basePath
-    QDir dir(basePath);
+    QDir dir(imgPath);
     QStringList filters;
     filters << "*.jpeg" << "*.png" << "*.bmp";
     QStringList paths = dir.entryList(filters, QDir::Files);
     for(const QString& path : paths){
-        this->scanPiece((basePath + path).toStdString());
+        this->scanPiece((imgPath + path).toStdString());
     }
 
 
@@ -41,7 +45,7 @@ void AppController::scanPiece(const std::string& imagePath)
     piece->id = (int)pieceInfo.size();
     piece->name = QString("Teil_%1").arg(piece->id);
     std::cout << "Scanning piece: " << piece->name.toStdString() << std::endl;
-    std::string outputDir = "/home/kimi-sickinger/Programmieren/qt/piecePilot_v2/src/out/" + piece->name.toStdString() + "/";
+    std::string outputDir = basePath.toStdString() + "/out/" + piece->name.toStdString() + "/";
     QDir().mkpath(QString::fromStdString(outputDir)); // create output directory if it doesn't exist
     this->pieceScanner->scanPiece(piece, imagePath, outputDir);
     /* auto r = this->pieceScanner->scanFromImage(imagePath, "/home/kimi-sickinger/Programmieren/qt/piecePilot/src/out/", piece);

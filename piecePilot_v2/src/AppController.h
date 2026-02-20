@@ -39,4 +39,5 @@ private:
 
     Board* board = nullptr;
     //void generateDummyPieces();
+    QString basePath;
 };

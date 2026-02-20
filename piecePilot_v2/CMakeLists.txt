@@ -3,6 +3,7 @@ project(kantenAnzeigen LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 find_package(OpenCV REQUIRED)
@@ -16,7 +17,10 @@ file(GLOB SRC_FILES CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/gui/*.h"
 )
 
-add_executable(kantenAnzeigen ${SRC_FILES})
+set(BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(kantenAnzeigen PRIVATE Qt6::Widgets ${OpenCV_LIBS})
-target_include_directories(kantenAnzeigen PRIVATE ${OpenCV_INCLUDE_DIRS})
+add_executable(piecePilot ${SRC_FILES})
+
+target_link_libraries(piecePilot PRIVATE Qt6::Widgets ${OpenCV_LIBS})
+target_include_directories(piecePilot PRIVATE ${OpenCV_INCLUDE_DIRS})
+target_compile_definitions(piecePilot PRIVATE BASE_DIR=\"${BASE_DIR}\")
